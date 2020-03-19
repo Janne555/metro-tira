@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script>var exports = {};</script>
+</head>
+
+<body style="margin: 0; padding: 0;">
+  <header>
+    <a href="index.html">Alkuun</a>
+  </header>
+  <article style="margin: 1rem;">
+    <h1>Tehtävä 1: Pino</h1>
+    <h2>Opastus</h2>
+    <p style="max-width: 500px;">
+      Kirjoita viesti ja laita alkio pinoon painamalla enter tai klikkaamalla "Lisää pinoon".
+      Voit ottaa pinon päällimmäisen alkion uudelleen käsittelyyn painamalla "Ota ensimmäinen".
+    </p>
+    <h2>Käyttöliittymä</h2>
+    <div>
+      <label for="pino_input">Data</label>
+      <input id="pino_input" />
+    </div>
+    <div>
+      <button id="pino_lisaa">Lisää pinoon</button>
+      <button id="pino_tyhjaa">Tyhjää pino</button>
+      <button id="pino_ota_eka">Ota ensimmäinen</button>
+    </div>
+    <ul id="pino_lista"></ul>
+    <script src="pino.js"></script>
+    <h2>Lähdekoodi</h2>
+    <p>Alla on esillä tietorakenteen kannalta oleellinen lähdekoodi TypeScriptillä kirjoitettuna</p>
+    <pre style="border: 1px solid black; max-width: 600px; padding: 1em;">
+    class ListItem {
+      data?: string
+      next?: ListItem
+    }
+    
+    class Stack {
+      top?: ListItem
+      size: number = 0
+    
+      /**
+       * Muodosta uusi lista-alkio ja vie se pinon huipulle
+       */
+      push = (aData: string): void => {
+        const listItem = new ListItem()
+        listItem.data = aData
+        listItem.next = this.top
+        this.top = listItem
+        this.size++
+      }
+    
+      /**
+       * Poista ja palauta alkio pinon huipulta.
+       * Jos pino on tyhjä, palauta null
+       */
+      pop = (): ListItem | undefined => {
+        const prevTop = this.top
+        this.top = prevTop?.next
+        if (this.size > 0) {
+          this.size--
+        }
+        return prevTop
+      }
+    
+      /**
+       * Tulosta pinon sisältö muuttamatta pinoa
+       */
+      printItems = (): string[] => {
+        let current = this.top
+        let items: string[] = []
+        while (current) {
+          items.push(current.data ?? "")
+          current = current.next
+        }
+        return items
+      }
+    
+      getSize = (): number => {
+        return this.size
+      }
+    }
+  </pre>
+  </article>
+</body>
+
+</html>

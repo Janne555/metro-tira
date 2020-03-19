@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script>var exports = {};</script>
+</head>
+
+<body>
+  <a href="index.html">Alkuun</a>
+  <h1>Tehtävä 2: Jono</h1>
+  <h2>Opastus</h2>
+  <p style="max-width: 500px;">
+    Kirjoita viesti ja laita alkio jonoon painamalla enter tai klikkaamalla "Lisää jonoon".
+    Voit ottaa jonon ensimmäisen alkion uudelleen käsittelyyn painamalla "Ota ensimmäinen".
+  </p>
+  <h2>Käyttöliittymä</h2>
+  <div>
+    <label for="jono_input">Data</label>
+    <input id="jono_input" />
+  </div>
+  <div>
+    <button id="jono_lisaa">Lisää jonoon</button>
+    <button id="jono_tyhjaa">Tyhjää jono</button>
+    <button id="jono_ota_eka">Ota ensimmäinen</button>
+  </div>
+  <ul id="jono_lista"></ul>
+  <script src="jono.js"></script>
+  <h2>Lähdekoodi</h2>
+  <p>Alla on esillä tietorakenteen kannalta oleellinen lähdekoodi TypeScriptillä kirjoitettuna</p>
+  <pre style="border: 1px solid black; max-width: 600px; padding: 1em;">
+    class ListItem {
+      data?: string
+      prev?: ListItem
+    }
+    
+    class Jono {
+      head?: ListItem
+      size: number = 0
+    
+      /**
+       * Muodosta uusi lista-alkio ja vie se jonon häntään
+       */
+      push = (aData: string): void => {
+        const listItem = new ListItem()
+        listItem.data = aData
+    
+        // jos päätä ei ole vielä aseta uusi alkio pääksi
+        if (!this.head) {
+          this.head = listItem
+        } else {
+          // käy läpi alkiot ja aseta uusi jäsen jonon häntään
+          let current = this.head
+          while (current?.prev) {
+            current = current.prev
+          }
+          current.prev = listItem
+        }
+        this.size++
+      }
+    
+      /**
+       * Poista ja palauta alkio jonon alusta.
+       * Jos jono on tyhjä, palauta undefined
+       */
+      pop = (): ListItem | undefined => {
+        const prevHead = this.head
+        this.head = prevHead?.prev
+        if (this.size > 0) {
+          this.size--
+        }
+        return prevHead
+      }
+    
+      /**
+       * Tulosta pinon sisältö muuttamatta pinoa
+       */
+      printItems = (): string[] => {
+        let current = this.head
+        let items: string[] = []
+        while (current) {
+          items.push(current.data ?? "")
+          current = current.prev
+        }
+        return items
+      }
+    
+      getSize = (): number => {
+        return this.size
+      }
+    }
+  </pre>
+</body>
+
+</html>
