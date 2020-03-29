@@ -1,5 +1,5 @@
 
-import { Stack } from './pino'
+import { Stack } from '../pino'
 
 sen("pitäisi tulostaa alkiot", () => {
   const messages = ["Lorem", "ipsum", "dolor", "sit", "amet"]
