@@ -13,6 +13,7 @@ var Jono = /** @class */ (function () {
          * Muodosta uusi lista-alkio ja vie se jonon häntään
          */
         this.push = function (aData) {
+            var _a;
             var listItem = new ListItem();
             listItem.data = aData;
             // jos päätä ei ole vielä aseta uusi alkio pääksi
@@ -22,7 +23,7 @@ var Jono = /** @class */ (function () {
             else {
                 // käy läpi alkiot ja aseta uusi jäsen jonon häntään
                 var current = _this.head;
-                while (current === null || current === void 0 ? void 0 : current.prev) {
+                while ((_a = current) === null || _a === void 0 ? void 0 : _a.prev) {
                     current = current.prev;
                 }
                 current.prev = listItem;
@@ -34,8 +35,9 @@ var Jono = /** @class */ (function () {
          * Jos jono on tyhjä, palauta undefined
          */
         this.pop = function () {
+            var _a;
             var prevHead = _this.head;
-            _this.head = prevHead === null || prevHead === void 0 ? void 0 : prevHead.prev;
+            _this.head = (_a = prevHead) === null || _a === void 0 ? void 0 : _a.prev;
             if (_this.size > 0) {
                 _this.size--;
             }
@@ -49,7 +51,7 @@ var Jono = /** @class */ (function () {
             var current = _this.head;
             var items = [];
             while (current) {
-                items.push((_a = current.data) !== null && _a !== void 0 ? _a : "");
+                items.push((_a = current.data, (_a !== null && _a !== void 0 ? _a : "")));
                 current = current.prev;
             }
             return items;
@@ -82,7 +84,7 @@ exports.Jono = Jono;
     };
     popButton.onclick = function () {
         var _a, _b;
-        input.value = (_b = (_a = stack.pop()) === null || _a === void 0 ? void 0 : _a.data) !== null && _b !== void 0 ? _b : "";
+        input.value = (_b = (_a = stack.pop()) === null || _a === void 0 ? void 0 : _a.data, (_b !== null && _b !== void 0 ? _b : ""));
         reDisplayStack();
     };
     function handleAdd() {

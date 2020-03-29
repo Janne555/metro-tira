@@ -1,5 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var Iterator = /** @class */ (function () {
+    function Iterator(pino) {
+        var _this = this;
+        this.hasNext = function () {
+            return _this.current !== undefined;
+        };
+        this.next = function () {
+            if (_this.current) {
+                var oldCurrent = _this.current;
+                _this.current = _this.current.next;
+                return oldCurrent;
+            }
+            else {
+                return undefined;
+            }
+        };
+        this.pino = pino;
+        this.current = pino.top;
+    }
+    return Iterator;
+}());
+exports.Iterator = Iterator;
 var ListItem = /** @class */ (function () {
     function ListItem() {
     }
@@ -51,38 +73,33 @@ var Stack = /** @class */ (function () {
     }
     return Stack;
 }());
-exports.Stack = Stack;
 (function () {
     if (!window)
         return;
-    var input = document.querySelector("#pino_input");
-    var list = document.querySelector("#pino_lista");
-    var addButton = document.querySelector("#pino_lisaa");
-    var clearButton = document.querySelector("#pino_tyhjaa");
-    var popButton = document.querySelector("#pino_ota_eka");
+    var start = document.querySelector("#iteraattori_aloita");
+    var next = document.querySelector("#iteraattori_seuraava");
+    var list = document.querySelector("#iteraattori_lista");
+    var current = document.querySelector("#iteraattori_nykyinen");
     var stack = new Stack();
-    addButton.onclick = handleAdd;
-    input.onkeypress = function (event) {
-        if (event.keyCode === 13) {
-            handleAdd();
-        }
-    };
-    clearButton.onclick = function () {
+    var iterator = new Iterator(stack);
+    start.onclick = function () {
+        next.disabled = false;
+        current.innerHTML = "[ei tietoa]";
         stack = new Stack();
-        list.innerHTML = '';
+        for (var i = 0; i < 5; i++) {
+            stack.push("" + Math.floor(Math.random() * 100));
+        }
+        reDisplayStack();
+        iterator = new Iterator(stack);
     };
-    popButton.onclick = function () {
+    next.onclick = function () {
         var _a, _b;
-        input.value = (_b = (_a = stack.pop()) === null || _a === void 0 ? void 0 : _a.data, (_b !== null && _b !== void 0 ? _b : ""));
+        current.innerText = (_b = (_a = iterator.next()) === null || _a === void 0 ? void 0 : _a.data, (_b !== null && _b !== void 0 ? _b : ""));
+        if (!iterator.hasNext()) {
+            next.disabled = true;
+        }
         reDisplayStack();
     };
-    function handleAdd() {
-        if (!input.value)
-            return;
-        stack.push(input.value);
-        input.value = "";
-        reDisplayStack();
-    }
     function reDisplayStack() {
         list.innerHTML = '';
         stack.printItems().forEach(function (item) {

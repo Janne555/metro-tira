@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var pino_1 = require("./pino");
+var pino_1 = require("../pino");
 sen("pitäisi tulostaa alkiot", function () {
     var messages = ["Lorem", "ipsum", "dolor", "sit", "amet"];
     var stack = new pino_1.Stack();

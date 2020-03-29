@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <script>var exports = {};</script>
+</head>
+
+<body style="margin: 0; padding: 0;">
+  <header>
+    <a href="index.html">Alkuun</a>
+  </header>
+  <article style="margin: 1rem;">
+    <h1>Tehtävä 5: Iteraattori</h1>
+    <h2>Opastus</h2>
+    <p style="max-width: 500px;">
+      Generoi pinolle sisältö painamalla Aloita-painiketta. Ota pinosta seuraava alkio painamalla Seuraava-painiketta.
+      Aloita alusta painamalla Aloita-painiketta. Seuraava-painike lakkaa toimimasta kun iteraattori pääsee loppuun.
+    </p>
+    <h2>Käyttöliittymä</h2>
+    <div>
+      <button id="iteraattori_aloita">Aloita</button>
+      <button id="iteraattori_seuraava">Seuraava</button>
+    </div>
+    <h3>Iteraattorin palautus</h3>
+    <span id="iteraattori_nykyinen">[ei tietoa]</span>
+    <h3>Pinon sisältö</h3>
+    <ul id="iteraattori_lista">
+      <li>Lista on tyhjä</li>
+    </ul>
+    <h2>Lähdekoodi</h2>
+    <p>Alla on esillä tietorakenteen kannalta oleellinen lähdekoodi TypeScriptillä kirjoitettuna</p>
+    <pre style="border: 1px solid black; max-width: 600px; padding: 1em;">
+      class Iterator {
+        pino: Stack
+        current?: ListItem
+      
+        constructor(pino: Stack) {
+          this.pino = pino
+          this.current = pino.top
+        }
+      
+        hasNext = (): boolean => {
+          return this.current !== undefined
+        }
+      
+        next = (): ListItem | undefined => {
+          if (this.current) {
+            const oldCurrent = this.current
+            this.current = this.current.next
+            return oldCurrent
+          } else {
+            return undefined
+          }
+        }
+      }
+    </pre>
+  </article>
+  <script src="iteraattori.js"></script>
+</body>
+
+</html>
