@@ -24,9 +24,8 @@ var Stack = /** @class */ (function () {
          * Jos pino on tyhjä, palauta null
          */
         this.pop = function () {
-            var _a;
             var prevTop = _this.top;
-            _this.top = (_a = prevTop) === null || _a === void 0 ? void 0 : _a.next;
+            _this.top = prevTop === null || prevTop === void 0 ? void 0 : prevTop.next;
             if (_this.size > 0) {
                 _this.size--;
             }
@@ -40,7 +39,7 @@ var Stack = /** @class */ (function () {
             var current = _this.top;
             var items = [];
             while (current) {
-                items.push((_a = current.data, (_a !== null && _a !== void 0 ? _a : "")));
+                items.push((_a = current.data) !== null && _a !== void 0 ? _a : "");
                 current = current.next;
             }
             return items;
@@ -73,7 +72,7 @@ exports.Stack = Stack;
     };
     popButton.onclick = function () {
         var _a, _b;
-        input.value = (_b = (_a = stack.pop()) === null || _a === void 0 ? void 0 : _a.data, (_b !== null && _b !== void 0 ? _b : ""));
+        input.value = (_b = (_a = stack.pop()) === null || _a === void 0 ? void 0 : _a.data) !== null && _b !== void 0 ? _b : "";
         reDisplayStack();
     };
     function handleAdd() {
