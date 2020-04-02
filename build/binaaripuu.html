@@ -27,7 +27,7 @@
     }
 
     article {
-      min-width: 700px;
+      width: 800px;
     }
   </style>
 </head>
@@ -60,9 +60,9 @@
         <button id="binaaripuu_esijarjestys">Tulosta esijärjestys</button>
       </div>
       <h3>Haun tulos</h3>
-      <span id="binaaripuu_hakutulos">[ei tietoa]</span>
+      <p id="binaaripuu_hakutulos"></p>
       <h3>Esijärjestys</h3>
-      <span id="binaaripuu_esijarjestys_tulos"></span>
+      <p id="binaaripuu_esijarjestys_tulos"></p>
       <h2>Lähdekoodi</h2>
       <p>Alla on esillä tietorakenteen kannalta oleellinen lähdekoodi TypeScriptillä kirjoitettuna</p>
       <pre style="border: 1px solid black; padding: 1em;">
@@ -196,7 +196,7 @@
     }
 
     binaaripuu_hae.onclick = function () {
-      handleHae()
+      handleHae();
     }
 
     binaaripuu_lisaa.onclick = function () {
@@ -206,19 +206,21 @@
     binaaripuu_tyhjenna.onclick = function () {
       puu = undefined;
       diagram.innerHTML = "";
+      binaaripuu_esijarjestys_tulos.innerText = "";
+      binaaripuu_hakutulos.innerText = ""
     }
 
     binaaripuu_esijarjestys.onclick = function () {
       if (puu) {
-        binaaripuu_esijarjestys_tulos.innerText = puu.esiJarjestys()
+        binaaripuu_esijarjestys_tulos.innerText = puu.esiJarjestys();
       } else {
-        binaaripuu_esijarjestys_tulos.innerText = "[puuta ei ole alustettu]"
+        binaaripuu_esijarjestys_tulos.innerText = "[puuta ei ole alustettu]";
       }
     }
 
     function handleAdd() {
       var value = binaaripuu_input.value;
-      binaaripuu_input.value = ""
+      binaaripuu_input.value = "";
       if (value.length < 1) {
         return
       }
@@ -229,7 +231,7 @@
         try {
           puu.insert(value);
         } catch (error) {
-          console.error(error)
+          console.error(error);
         }
       }
 
@@ -238,16 +240,16 @@
 
     function handleHae() {
       if (puu) {
-        var result = puu.find(binaaripuu_haku.value)
+        var result = puu.find(binaaripuu_haku.value);
         if (result && result.juuri) {
-          binaaripuu_hakutulos.innerText = result.juuri.data
+          binaaripuu_hakutulos.innerText = result.juuri.data;
         } else {
-          binaaripuu_hakutulos.innerText = "[ei löytynyt]"
+          binaaripuu_hakutulos.innerText = "[ei löytynyt]";
         }
       } else {
-        binaaripuu_hakutulos.innerText = "[puuta ei ole alustettu]"
+        binaaripuu_hakutulos.innerText = "[puuta ei ole alustettu]";
       }
-      binaaripuu_haku.value = ""
+      binaaripuu_haku.value = "";
     }
 
     function update(source) {
