@@ -2,120 +2,130 @@
 var BinaariPuu = /** @class */ (function () {
     function BinaariPuu(juuriArvo) {
         var _this = this;
-        this.remove = function (data) {
-            var _a, _b, _c, _d, _e, _f;
-            if (((_c = (_b = (_a = _this.juuri) === null || _a === void 0 ? void 0 : _a.oikea) === null || _b === void 0 ? void 0 : _b.juuri) === null || _c === void 0 ? void 0 : _c.data) === data) {
-                if (!_this.juuri.oikea.juuri.oikea && !_this.juuri.oikea.juuri.vasen) {
-                    _this.juuri.oikea = undefined;
-                }
-                else if (_this.juuri.oikea.juuri.oikea && !_this.juuri.oikea.juuri.vasen) {
-                    _this.juuri.oikea = _this.juuri.oikea.juuri.oikea;
-                }
-                else if (!_this.juuri.oikea.juuri.oikea && _this.juuri.oikea.juuri.vasen) {
-                    _this.juuri.vasen = _this.juuri.oikea.juuri.vasen;
-                    _this.juuri.oikea = undefined;
-                }
-                else {
-                }
-            }
-            else if (((_f = (_e = (_d = _this.juuri) === null || _d === void 0 ? void 0 : _d.vasen) === null || _e === void 0 ? void 0 : _e.juuri) === null || _f === void 0 ? void 0 : _f.data) === data) {
-                if (!_this.juuri.vasen.juuri.oikea && !_this.juuri.vasen.juuri.vasen) {
-                    _this.juuri.vasen = undefined;
-                }
-                else if (_this.juuri.vasen.juuri.oikea && !_this.juuri.vasen.juuri.vasen) {
-                    _this.juuri.oikea = _this.juuri.vasen.juuri.oikea;
-                    _this.juuri.vasen = undefined;
-                }
-                else if (!_this.juuri.vasen.juuri.oikea && _this.juuri.vasen.juuri.vasen) {
-                    _this.juuri.vasen = _this.juuri.vasen.juuri.vasen;
-                }
-                else {
-                }
-            }
+        this.lisaa = function (data) {
+            _this.juuri.lisaa(Number(data));
         };
-        this.insert = function (data) {
-            var _a;
-            if (((_a = _this.juuri) === null || _a === void 0 ? void 0 : _a.data) === data) {
-                throw new Error("Saman arvon lisäämistä toisen kerran ei ole tuettu");
-            }
-            if (_this.juuri == null) {
-                _this.juuri = new Solmu(data);
-            }
-            else if (_this.juuri.data > data) {
-                if (_this.juuri.vasen) {
-                    _this.juuri.vasen.insert(data);
-                }
-                else {
-                    _this.juuri.vasen = new BinaariPuu(data);
-                }
-            }
-            else {
-                if (_this.juuri.oikea) {
-                    _this.juuri.oikea.insert(data);
-                }
-                else {
-                    _this.juuri.oikea = new BinaariPuu(data);
-                }
-            }
-        };
-        this.find = function (data) {
-            var _a, _b;
-            if (!_this.juuri) {
-                return undefined;
-            }
-            if (_this.juuri.data === data) {
-                return _this;
-            }
-            // jos vasenta tai oikeaa juurta ei ole määritelty funktion tulos on undefined
-            if (_this.juuri.data > data) {
-                return (_a = _this.juuri.vasen) === null || _a === void 0 ? void 0 : _a.find(data);
-            }
-            else {
-                return (_b = _this.juuri.oikea) === null || _b === void 0 ? void 0 : _b.find(data);
-            }
-        };
-        this.vasemmanPuoleisin = function (edellinen) {
-            var _a;
-            if ((_a = _this.juuri) === null || _a === void 0 ? void 0 : _a.vasen) {
-                return _this.juuri.vasen.vasemmanPuoleisin();
-            }
-            else {
-                return _this;
-            }
+        this.etsi = function (data) {
+            return _this.juuri.etsi(Number(data));
         };
         this.esiJarjestys = function () {
-            var tulos = "";
-            if (!_this.juuri) {
-                tulos = "";
-            }
-            else {
-                tulos = _this.juuri.data;
-                if (_this.juuri.vasen) {
-                    tulos = tulos + ", " + _this.juuri.vasen.esiJarjestys();
-                }
-                if (_this.juuri.oikea) {
-                    tulos = tulos + ", " + _this.juuri.oikea.esiJarjestys();
-                }
-            }
-            return tulos;
+            return _this.juuri.esiJarjestys();
         };
         /**
          * Tekee diagrammidatan d3 visualisointia varten. Lisää tyhjiä lehtiä jotta
          * vasen ja oikea lehti on helpompi erottaa toisistaan
          */
         this.diagrammiData = function (parent) {
-            if (!_this.juuri) {
-                throw Error("Ei dataa");
+            return _this.juuri.diagrammiData(parent);
+        };
+        this.poista = function (data) {
+            _this.juuri.poista(Number(data));
+        };
+        this.vasemmanPuoleisin = function () {
+            return _this.juuri.vasemmanPuoleisin();
+        };
+        this.juuri = new Solmu(juuriArvo);
+    }
+    return BinaariPuu;
+}());
+var Solmu = /** @class */ (function () {
+    function Solmu(data) {
+        var _this = this;
+        this.poista = function (data, vanhempi) {
+            console.log(data, vanhempi);
+            if (_this.data > data) {
+                console.log(_this.data, data, "vasen");
+                if (_this.vasen) {
+                    _this.vasen.poista(data, _this);
+                }
             }
+            else if (_this.data < data) {
+                console.log(_this.data, data, "oikea");
+                if (_this.oikea) {
+                    _this.oikea.poista(data, _this);
+                }
+            }
+            else {
+                if (!vanhempi) {
+                    throw new Error("Poisto epäonnistui");
+                }
+                if (_this.oikea && _this.vasen) {
+                    _this.data = _this.vasen.vasemmanPuoleisin();
+                    _this.vasen.poista(_this.data, _this);
+                }
+                else if (vanhempi.vasen === _this) {
+                    vanhempi.vasen = _this.vasen ? _this.vasen : _this.oikea;
+                }
+                else if (vanhempi.oikea === _this) {
+                    vanhempi.oikea = _this.vasen ? _this.vasen : _this.oikea;
+                }
+            }
+        };
+        this.vasemmanPuoleisin = function () {
+            if (!_this.vasen) {
+                return _this.data;
+            }
+            else {
+                return _this.vasen.vasemmanPuoleisin();
+            }
+        };
+        this.lisaa = function (data) {
+            if (_this.data > data) {
+                if (_this.vasen) {
+                    _this.vasen.lisaa(data);
+                }
+                else {
+                    _this.vasen = new Solmu(data);
+                }
+            }
+            else if (_this.data < data) {
+                if (_this.oikea) {
+                    _this.oikea.lisaa(data);
+                }
+                else {
+                    _this.oikea = new Solmu(data);
+                }
+            }
+            else {
+                throw new Error("Saman arvon lisäämistä toisen kerran ei ole tuettu");
+            }
+        };
+        this.etsi = function (data) {
+            var _a, _b;
+            if (_this.data < data) {
+                return (_a = _this.vasen) === null || _a === void 0 ? void 0 : _a.etsi(data);
+            }
+            else if (_this.data > data) {
+                return (_b = _this.oikea) === null || _b === void 0 ? void 0 : _b.etsi(data);
+            }
+            else {
+                return _this;
+            }
+        };
+        this.esiJarjestys = function () {
+            var tulos = "" + _this.data;
+            if (_this.vasen) {
+                tulos = tulos + ", " + _this.vasen.esiJarjestys();
+            }
+            if (_this.oikea) {
+                tulos = tulos + ", " + _this.oikea.esiJarjestys();
+            }
+            return tulos;
+        };
+        /**
+       * Tekee diagrammidatan d3 visualisointia varten. Lisää tyhjiä lehtiä jotta
+       * vasen ja oikea lehti on helpompi erottaa toisistaan
+       */
+        this.diagrammiData = function (parent) {
             var tulos = {
-                name: _this.juuri.data,
+                name: _this.data,
                 parent: parent,
                 children: []
             };
-            if (_this.juuri.vasen) {
-                tulos.children.push(_this.juuri.vasen.diagrammiData(_this.juuri.data));
+            if (_this.vasen) {
+                tulos.children.push(_this.vasen.diagrammiData(_this.data));
             }
-            if (_this.juuri.oikea) {
+            if (_this.oikea) {
                 if (tulos.children.length === 0) {
                     tulos.children.push({
                         name: "null",
@@ -123,7 +133,7 @@ var BinaariPuu = /** @class */ (function () {
                         children: []
                     });
                 }
-                tulos.children.push(_this.juuri.oikea.diagrammiData(_this.juuri.data));
+                tulos.children.push(_this.oikea.diagrammiData(_this.data));
             }
             else {
                 if (tulos.children.length === 1) {
@@ -136,20 +146,7 @@ var BinaariPuu = /** @class */ (function () {
             }
             return tulos;
         };
-        if (juuriArvo != null) {
-            this.juuri = new Solmu(juuriArvo);
-        }
-    }
-    return BinaariPuu;
-}());
-var Solmu = /** @class */ (function () {
-    function Solmu(data, vasen, oikea) {
         this.data = data;
-        this.vasen = vasen;
-        this.oikea = oikea;
     }
     return Solmu;
 }());
-function xor(a, b) {
-    return (a && !b) || (!a && b);
-}
