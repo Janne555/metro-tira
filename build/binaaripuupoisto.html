@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <script>var exports = {};</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+  <style>
+    .node circle {
+      fill: #fff;
+      stroke: steelblue;
+      stroke-width: 3px;
+    }
+
+    .node text {
+      font: 12px sans-serif;
+    }
+
+    .link {
+      fill: none;
+      stroke: #ccc;
+      stroke-width: 2px;
+    }
+
+    .content {
+      display: flex;
+    }
+
+    article {
+      width: 800px;
+    }
+  </style>
+</head>
+
+<body style="margin: 0; padding: 0;">
+  <header>
+    <a href="index.html">Alkuun</a>
+  </header>
+  <div class="content">
+    <article style="margin: 1rem;">
+      <h1>Tehtävä 9: Solmun poisto binaaripuusta</h1>
+      <h2>Opastus</h2>
+      <p style="max-width: 500px;">
+        Lisää puuhun solmuja. Voit valita poistettavan solmun klikkaamalla sitä puusta tai kirjoittamalla sen nimen
+        hakukenttään.
+        <br> Puun visualisointiin liittyvä koodi otettu <a href="https://bl.ocks.org/d3noob/8326869">täältä</a>
+      </p>
+      <h2>Käyttöliittymä</h2>
+      <div>
+        <label>Syöte</label>
+        <input id="binaaripuu_input" />
+        <button id="binaaripuu_lisaa">Lisaa solmu</button>
+      </div>
+      <div>
+        <label>Haku</label>
+        <input id="binaaripuu_haku" />
+        <button id="binaaripuu_hae">Hae puusta</button>
+      </div>
+      <div>
+        <button id="binaaripuu_tyhjenna">Tyhjennä</button>
+        <button id="binaaripuu_esijarjestys">Tulosta esijärjestys</button>
+      </div>
+      <h3>Valinta</h3>
+      <p id="binaaripuu_hakutulos"></p>
+      <button id="binaaripuu_poisto">Poista valittu solmu puusta</button>
+      <h3>Esijärjestys</h3>
+      <p id="binaaripuu_esijarjestys_tulos"></p>
+      <h2>Lähdekoodi</h2>
+      <p>Alla on esillä tietorakenteen kannalta oleellinen lähdekoodi TypeScriptillä kirjoitettuna</p>
+      <pre style="border: 1px solid black; padding: 1em;">
+    </pre>
+    </article>
+
+    <aside>
+      <h3>Puun sisältö</h3>
+      <div id="diagram"></div>
+    </aside>
+  </div>
+  <script src="binaaripuu.js"></script>
+  <script>
+    var puu = undefined;
+    var valinta = undefined;
+
+    binaaripuu_input.onkeypress = function (event) {
+      if (event.keyCode === 13) {
+        handleAdd();
+      }
+    }
+
+    binaaripuu_haku.onkeypress = function (event) {
+      if (event.keyCode === 13) {
+        handleHae(binaaripuu_haku.value);
+        binaaripuu_haku.value = "";
+      }
+    }
+
+    binaaripuu_hae.onclick = function () {
+      handleHae(binaaripuu_haku.value);
+      binaaripuu_haku.value = "";
+    }
+
+    binaaripuu_lisaa.onclick = function () {
+      handleAdd();
+    }
+
+    binaaripuu_tyhjenna.onclick = function () {
+      puu = undefined;
+      diagram.innerHTML = "";
+      binaaripuu_esijarjestys_tulos.innerText = "";
+      binaaripuu_hakutulos.innerText = ""
+    }
+
+    binaaripuu_esijarjestys.onclick = function () {
+      if (puu) {
+        binaaripuu_esijarjestys_tulos.innerText = puu.esiJarjestys();
+      } else {
+        binaaripuu_esijarjestys_tulos.innerText = "[puuta ei ole alustettu]";
+      }
+    }
+
+    binaaripuu_poisto.onclick = function () {
+      if (valinta && puu) {
+        puu.poista(valinta)
+      }
+    }
+
+    function handleAdd() {
+      var value = binaaripuu_input.value;
+      binaaripuu_input.value = "";
+      if (value.length < 1) {
+        return
+      }
+
+      if (!puu) {
+        puu = new BinaariPuu(value);
+      } else {
+        try {
+          puu.insert(value);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      update(puu.diagrammiData("null"));
+    }
+
+    function handleHae(hakuArvo) {
+      if (puu) {
+        var result = puu.find(hakuArvo);
+        if (result && result.juuri) {
+          valinta = result.juuri.data;
+        }
+      }
+      naytaValinta();
+    }
+
+    function naytaValinta() {
+      if (valinta) {
+        binaaripuu_hakutulos.innerText = valinta;
+      } else {
+        binaaripuu_hakutulos.innerText = "[ei löytynyt]";
+      }
+    }
+
+    function update(source) {
+      diagram.innerHTML = ""
+      var margin = { top: 40, right: 120, bottom: 20, left: 120 },
+        width = 700 - margin.right - margin.left,
+        height = 500 - margin.top - margin.bottom;
+
+      var i = 0;
+
+      var tree = d3.layout.tree()
+        .size([height, width]);
+
+      var diagonal = d3.svg.diagonal()
+        .projection(function (d) { return [d.x, d.y]; });
+
+      var svg = d3.select("#diagram").append("svg")
+        .attr("width", width + margin.right + margin.left)
+        .attr("height", "100vh")
+        .style("height", d => d + "px")
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      // Compute the new tree layout.
+      var nodes = tree.nodes(source).reverse(),
+        links = tree.links(nodes);
+
+      // Normalize for fixed-depth.
+      nodes.forEach(function (d) { d.y = d.depth * 100; });
+
+      // Declare the nodes…
+      var node = svg.selectAll("g.node")
+        .data(nodes, function (d) { return d.id || (d.id = ++i); });
+
+      // Enter the nodes.
+      var nodeEnter = node.enter().append("g")
+        .attr("class", "node")
+        .attr("transform", function (d) {
+          return "translate(" + d.x + "," + d.y + ")";
+        })
+        .on('click', function (event) {
+          valinta = event.name;
+          naytaValinta();
+        });
+
+      nodeEnter.append("circle")
+        .attr("r", 10)
+        .style("fill", "#fff");
+
+      nodeEnter.append("text")
+        .attr("y", function (d) {
+          return d.children || d._children ? -18 : 18;
+        })
+        .attr("dy", ".35em")
+        .attr("text-anchor", "middle")
+        .text(function (d) { return d.name; })
+        .style("fill-opacity", 1);
+
+      // Declare the links…
+      var link = svg.selectAll("path.link")
+        .data(links, function (d) { return d.target.id; });
+
+      // Enter the links.
+      link.enter().insert("path", "g")
+        .attr("class", "link")
+        .attr("d", diagonal);
+    }
+  </script>
+</body>
+
+</html>
