@@ -38,7 +38,7 @@
   </header>
   <div class="content">
     <article style="margin: 1rem;">
-      <h1>Tehtävä 9: Solmun poisto binaaripuusta</h1>
+      <h1>Tehtävä 9: Solmun poisto binääripuusta</h1>
       <h2>Opastus</h2>
       <p style="max-width: 500px;">
         Lisää puuhun solmuja. Voit valita poistettavan solmun klikkaamalla sitä puusta tai kirjoittamalla sen nimen
@@ -59,6 +59,8 @@
       <div>
         <button id="binaaripuu_tyhjenna">Tyhjennä</button>
         <button id="binaaripuu_esijarjestys">Tulosta esijärjestys</button>
+        <button id="binaaripuu_vasemmanpuoleisin">Valitse vasemman puoleisin</button>
+        <button id="binaaripuu_satunnainen">Satunnainen puu</button>
       </div>
       <h3>Valinta</h3>
       <p id="binaaripuu_hakutulos"></p>
@@ -76,7 +78,7 @@
       <div id="diagram"></div>
     </aside>
   </div>
-  <script src="binaaripuu.js"></script>
+  <script src="binaaripuuPoisto.js"></script>
   <script>
     var puu = undefined;
     var valinta = undefined;
@@ -122,6 +124,26 @@
       if (valinta && puu) {
         puu.poista(valinta)
       }
+    }
+
+    binaaripuu_vasemmanpuoleisin.onclick = function () {
+      if (puu) {
+        const vasein = puu.vasemmanPuoleisin();
+        if (vasein) {
+          valinta = vasein.juuri.data
+        }
+        naytaValinta();
+      }
+    }
+
+    binaaripuu_satunnainen.onclick = function () {
+      puu = new BinaariPuu(Math.ceil(Math.random() * 100))
+      for (let i = 0; i < 11; i++) {
+        try {
+          puu.insert(Math.ceil(Math.random() * 100));
+        } catch { }
+      }
+      update(puu.diagrammiData("null"));
     }
 
     function handleAdd() {

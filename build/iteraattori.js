@@ -46,8 +46,9 @@ var Stack = /** @class */ (function () {
          * Jos pino on tyhjä, palauta null
          */
         this.pop = function () {
+            var _a;
             var prevTop = _this.top;
-            _this.top = prevTop === null || prevTop === void 0 ? void 0 : prevTop.next;
+            _this.top = (_a = prevTop) === null || _a === void 0 ? void 0 : _a.next;
             if (_this.size > 0) {
                 _this.size--;
             }
@@ -61,7 +62,7 @@ var Stack = /** @class */ (function () {
             var current = _this.top;
             var items = [];
             while (current) {
-                items.push((_a = current.data) !== null && _a !== void 0 ? _a : "");
+                items.push((_a = current.data, (_a !== null && _a !== void 0 ? _a : "")));
                 current = current.next;
             }
             return items;
@@ -93,7 +94,7 @@ var Stack = /** @class */ (function () {
     };
     next.onclick = function () {
         var _a, _b;
-        current.innerText = (_b = (_a = iterator.next()) === null || _a === void 0 ? void 0 : _a.data) !== null && _b !== void 0 ? _b : "";
+        current.innerText = (_b = (_a = iterator.next()) === null || _a === void 0 ? void 0 : _a.data, (_b !== null && _b !== void 0 ? _b : ""));
         if (!iterator.hasNext()) {
             next.disabled = true;
         }

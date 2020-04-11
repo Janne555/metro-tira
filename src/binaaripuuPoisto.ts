@@ -78,6 +78,14 @@ class BinaariPuu {
     }
   }
 
+  vasemmanPuoleisin = (edellinen?: BinaariPuu): BinaariPuu | undefined => {
+    if (this.juuri?.vasen) {
+      return this.juuri.vasen.vasemmanPuoleisin()
+    } else {
+      return this
+    }
+  }
+
   esiJarjestys = (): string => {
     let tulos = ""
     if (!this.juuri) {
@@ -95,6 +103,10 @@ class BinaariPuu {
     return tulos
   }
 
+  /**
+   * Tekee diagrammidatan d3 visualisointia varten. Lisää tyhjiä lehtiä jotta 
+   * vasen ja oikea lehti on helpompi erottaa toisistaan
+   */
   diagrammiData = (parent: string): PuuData => {
     if (!this.juuri) {
       throw Error("Ei dataa")
@@ -111,8 +123,24 @@ class BinaariPuu {
     }
 
     if (this.juuri.oikea) {
+      if (tulos.children.length === 0) {
+        tulos.children.push({
+          name: "null",
+          parent,
+          children: []
+        })
+      }
       tulos.children.push(this.juuri.oikea.diagrammiData(this.juuri.data))
+    } else {
+      if (tulos.children.length === 1) {
+        tulos.children.push({
+          name: "null",
+          parent,
+          children: []
+        })
+      }
     }
+
 
     return tulos
   }

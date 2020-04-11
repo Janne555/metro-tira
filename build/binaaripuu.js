@@ -1,92 +1,90 @@
 "use strict";
-var BinaariPuu = /** @class */ (function () {
-    function BinaariPuu(juuriArvo) {
-        var _this = this;
-        this.insert = function (data) {
-            var _a;
-            if (((_a = _this.juuri) === null || _a === void 0 ? void 0 : _a.data) === data) {
-                throw new Error("Saman arvon lisäämistä toisen kerran ei ole tuettu");
-            }
-            if (_this.juuri == null) {
-                _this.juuri = new Solmu(data);
-            }
-            else if (_this.juuri.data > data) {
-                if (_this.juuri.vasen) {
-                    _this.juuri.vasen.insert(data);
-                }
-                else {
-                    _this.juuri.vasen = new BinaariPuu(data);
-                }
-            }
-            else {
-                if (_this.juuri.oikea) {
-                    _this.juuri.oikea.insert(data);
-                }
-                else {
-                    _this.juuri.oikea = new BinaariPuu(data);
-                }
-            }
-        };
-        this.find = function (data) {
-            var _a, _b;
-            if (!_this.juuri) {
-                return undefined;
-            }
-            if (_this.juuri.data === data) {
-                return _this;
-            }
-            // jos vasenta tai oikeaa juurta ei ole määritelty funktion tulos on undefined
-            if (_this.juuri.data > data) {
-                return (_a = _this.juuri.vasen) === null || _a === void 0 ? void 0 : _a.find(data);
-            }
-            else {
-                return (_b = _this.juuri.oikea) === null || _b === void 0 ? void 0 : _b.find(data);
-            }
-        };
-        this.esiJarjestys = function () {
-            var tulos = "";
-            if (!_this.juuri) {
-                tulos = "";
-            }
-            else {
-                tulos = _this.juuri.data;
-                if (_this.juuri.vasen) {
-                    tulos = tulos + ", " + _this.juuri.vasen.esiJarjestys();
-                }
-                if (_this.juuri.oikea) {
-                    tulos = tulos + ", " + _this.juuri.oikea.esiJarjestys();
-                }
-            }
-            return tulos;
-        };
-        this.diagrammiData = function (parent) {
-            if (!_this.juuri) {
-                throw Error("Ei dataa");
-            }
-            var tulos = {
-                name: _this.juuri.data,
-                parent: parent,
-                children: []
-            };
-            if (_this.juuri.vasen) {
-                tulos.children.push(_this.juuri.vasen.diagrammiData(_this.juuri.data));
-            }
-            if (_this.juuri.oikea) {
-                tulos.children.push(_this.juuri.oikea.diagrammiData(_this.juuri.data));
-            }
-            return tulos;
-        };
-        if (juuriArvo != null) {
-            this.juuri = new Solmu(juuriArvo);
-        }
-    }
-    return BinaariPuu;
-}());
-var Solmu = /** @class */ (function () {
-    function Solmu(data, vasen, oikea) {
-        this.data = data;
-        this.vasen = vasen;
-        this.oikea = oikea;
-    }
-    return Solmu;
-}());
+// type PuuData = {
+//   name: string,
+//   parent: string,
+//   children: PuuData[]
+// }
+// class BinaariPuu {
+//   juuri?: Solmu
+//   constructor(juuriArvo?: string) {
+//     if (juuriArvo != null) {
+//       this.juuri = new Solmu(juuriArvo)
+//     }
+//   }
+//   insert = (data: string): void => {
+//     if (this.juuri?.data === data) {
+//       throw new Error("Saman arvon lisäämistä toisen kerran ei ole tuettu")
+//     }
+//     if (this.juuri == null) {
+//       this.juuri = new Solmu(data)
+//     } else if (this.juuri.data > data) {
+//       if (this.juuri.vasen) {
+//         this.juuri.vasen.insert(data)
+//       } else {
+//         this.juuri.vasen = new BinaariPuu(data)
+//       }
+//     } else {
+//       if (this.juuri.oikea) {
+//         this.juuri.oikea.insert(data)
+//       } else {
+//         this.juuri.oikea = new BinaariPuu(data)
+//       }
+//     }
+//   }
+//   find = (data: string): BinaariPuu | undefined => {
+//     if (!this.juuri) {
+//       return undefined
+//     }
+//     if (this.juuri.data === data) {
+//       return this
+//     }
+//     // jos vasenta tai oikeaa juurta ei ole määritelty funktion tulos on undefined
+//     if (this.juuri.data > data) {
+//       return this.juuri.vasen?.find(data)
+//     } else {
+//       return this.juuri.oikea?.find(data)
+//     }
+//   }
+//   esiJarjestys = (): string => {
+//     let tulos = ""
+//     if (!this.juuri) {
+//       tulos = ""
+//     } else {
+//       tulos = this.juuri.data
+//       if (this.juuri.vasen) {
+//         tulos = `${tulos}, ${this.juuri.vasen.esiJarjestys()}`
+//       }
+//       if (this.juuri.oikea) {
+//         tulos = `${tulos}, ${this.juuri.oikea.esiJarjestys()}`
+//       }
+//     }
+//     return tulos
+//   }
+//   diagrammiData = (parent: string): PuuData => {
+//     if (!this.juuri) {
+//       throw Error("Ei dataa")
+//     }
+//     const tulos: PuuData = {
+//       name: this.juuri.data,
+//       parent,
+//       children: []
+//     }
+//     if (this.juuri.vasen) {
+//       tulos.children.push(this.juuri.vasen.diagrammiData(this.juuri.data))
+//     }
+//     if (this.juuri.oikea) {
+//       tulos.children.push(this.juuri.oikea.diagrammiData(this.juuri.data))
+//     }
+//     return tulos
+//   }
+// }
+// class Solmu {
+//   data: string
+//   vasen?: BinaariPuu
+//   oikea?: BinaariPuu
+//   constructor(data: string, vasen?: BinaariPuu, oikea?: BinaariPuu) {
+//     this.data = data
+//     this.vasen = vasen
+//     this.oikea = oikea
+//   }
+// }
