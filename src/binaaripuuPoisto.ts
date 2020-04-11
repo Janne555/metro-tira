@@ -53,12 +53,10 @@ class Solmu {
   poista = (data: number, vanhempi?: Solmu) => {
     console.log(data, vanhempi)
     if (this.data > data) {
-      console.log(this.data, data, "vasen")
       if (this.vasen) {
         this.vasen.poista(data, this)
       }
     } else if (this.data < data) {
-      console.log(this.data, data, "oikea")
       if (this.oikea) {
         this.oikea.poista(data, this)
       }
@@ -67,8 +65,8 @@ class Solmu {
         throw new Error("Poisto epäonnistui")
       }
       if (this.oikea && this.vasen) {
-        this.data = this.vasen.vasemmanPuoleisin()
-        this.vasen.poista(this.data, this)
+        this.data = this.oikea.vasemmanPuoleisin()
+        this.oikea.poista(this.data, this)
       } else if (vanhempi.vasen === this) {
         vanhempi.vasen = this.vasen ? this.vasen : this.oikea
       } else if (vanhempi.oikea === this) {

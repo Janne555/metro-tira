@@ -34,13 +34,11 @@ var Solmu = /** @class */ (function () {
         this.poista = function (data, vanhempi) {
             console.log(data, vanhempi);
             if (_this.data > data) {
-                console.log(_this.data, data, "vasen");
                 if (_this.vasen) {
                     _this.vasen.poista(data, _this);
                 }
             }
             else if (_this.data < data) {
-                console.log(_this.data, data, "oikea");
                 if (_this.oikea) {
                     _this.oikea.poista(data, _this);
                 }
@@ -50,8 +48,8 @@ var Solmu = /** @class */ (function () {
                     throw new Error("Poisto epäonnistui");
                 }
                 if (_this.oikea && _this.vasen) {
-                    _this.data = _this.vasen.vasemmanPuoleisin();
-                    _this.vasen.poista(_this.data, _this);
+                    _this.data = _this.oikea.vasemmanPuoleisin();
+                    _this.oikea.poista(_this.data, _this);
                 }
                 else if (vanhempi.vasen === _this) {
                     vanhempi.vasen = _this.vasen ? _this.vasen : _this.oikea;
