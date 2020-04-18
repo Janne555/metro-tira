@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <script>var exports = {};</script>
+</head>
+
+<body style="margin: 0; padding: 0;">
+  <header>
+    <a href="index.html">Alkuun</a>
+  </header>
+  <div class="content">
+    <article style="margin: 1rem;">
+      <h1>Tehtävä 11: Binäärihaku</h1>
+      <h2>Käyttöliittymä</h2>
+      <div>
+        <label>Avain</label>
+        <input type="number" id="binaarihaku_avain" />
+        <label>Data</label>
+        <input type="text" id="binaarihaku_data" />
+        <button id="binaarihaku_lisaa">Lisaa alkio</button>
+      </div>
+      <div>
+        <label>Haku</label>
+        <input type="number" id="binaarihaku_haku" />
+        <button id="binaarihaku_hae">Hae listasta</button>
+      </div>
+      <div>
+        <button id="binaarihaku_tyhjenna">Tyhjennä</button>
+        <button id="binaarihaku_satunnainen">Satunnainen lista</button>
+      </div>
+      <h3>Sisältö</h3>
+      <ul id="binaarihaku_sisalto">
+
+      </ul>
+      <h3>Valinta</h3>
+      <p id="binaarihaku_hakutulos"></p>
+      <h2>Lähdekoodi</h2>
+      <p>Alla on esillä tietorakenteen kannalta oleellinen lähdekoodi TypeScriptillä kirjoitettuna</p>
+      <pre style="border: 1px solid black; padding: 1em;">
+    </pre>
+    </article>
+
+    <aside>
+      <h3>Puun sisältö</h3>
+      <div id="diagram"></div>
+    </aside>
+  </div>
+  <script src="binaarihaku.js"></script>
+  <script>
+    var lista = new Lista()
+
+    binaarihaku_lisaa.onclick = lisaaListaan
+
+    binaarihaku_hae.onclick = haeListasta
+
+    binaarihaku_satunnainen.onclick = function () {
+      lista = new Lista()
+      for (var i = 0; i < 10; i++) {
+        var avain = Math.round(Math.random() * 100)
+        var data = Math.random() + ""
+        lista.lisaa({ avain, data })
+      }
+      tulostaLista()
+    }
+
+    binaarihaku_tyhjenna.onclick = function () {
+      lista = new Lista()
+      tulostaLista()
+    }
+
+    function lisaaListaan() {
+      if (binaarihaku_avain.value.length > 0 && binaarihaku_data.value.length > 0) {
+        lista.lisaa({ avain: Number(binaarihaku_avain.value), data: binaarihaku_data.value })
+      }
+      clearInput("binaarihaku_avain")
+      clearInput("binaarihaku_data")
+      tulostaLista()
+    }
+
+    function clearInput(input) {
+      window[input].value = ""
+    }
+
+    function haeListasta() {
+      try {
+        var tulos = lista.hae(Number(binaarihaku_haku.value))
+        if (tulos) {
+          binaarihaku_hakutulos.innerText = `avain: ${tulos.avain}, data: ${tulos.data}`
+        } else {
+          binaarihaku_hakutulos.innerText = "ei löytynyt"
+        }
+      } catch (error) {
+        console.error(error)
+      }
+      clearInput("binaarihaku_haku")
+    }
+
+    function tulostaLista() {
+      binaarihaku_sisalto.innerHTML = ""
+      lista.sisalto.forEach(function (alkio) {
+        let li = document.createElement("li")
+        li.innerText = `avain: ${alkio.avain}, data: ${alkio.data}`
+        binaarihaku_sisalto.appendChild(li)
+      })
+    }
+  </script>
+</body>
+
+</html>
