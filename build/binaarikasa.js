@@ -30,21 +30,7 @@ var Binaarikasa = /** @class */ (function () {
         this.sisalto[0] = null;
     }
     Binaarikasa.prototype.deleteMin = function () {
-        var vasenLapsi = this.haeVasenLapsi(1);
-        var oikeaLapsi = this.haeOikeaLapsi(1);
-        var viimeinen = this.sisalto[this.sisalto.length - 1];
-        if (vasenLapsi && oikeaLapsi && viimeinen) {
-            if (vasenLapsi.alkio.avain > viimeinen.avain && oikeaLapsi.alkio.avain > viimeinen.avain) {
-                this.sisalto[1] = viimeinen;
-                this.sisalto[this.sisalto.length - 1] = null;
-            }
-            else {
-                this.percolateDown(1);
-            }
-        }
-        else {
-            this.percolateDown(1);
-        }
+        this.percolateDown(1);
     };
     Binaarikasa.prototype.insert = function (alkio) {
         var uusiPituus = this.sisalto.push(alkio);
@@ -65,23 +51,46 @@ var Binaarikasa = /** @class */ (function () {
         this.sisalto[index] = null;
         var vasenLapsi = this.haeVasenLapsi(index);
         var oikeaLapsi = this.haeOikeaLapsi(index);
+        var viimeinen = this.haeViimeinen();
+        if (!viimeinen) {
+            this.sisalto[index] = null;
+            return;
+        }
         if (vasenLapsi && oikeaLapsi) {
-            if (vasenLapsi.alkio.avain > oikeaLapsi.alkio.avain) {
+            if (vasenLapsi.alkio.avain > viimeinen.alkio.avain && oikeaLapsi.alkio.avain > viimeinen.alkio.avain) {
+                this.sisalto[index] = viimeinen.alkio;
+                this.sisalto[viimeinen.index] = null;
+            }
+            else {
+                if (vasenLapsi.alkio.avain > oikeaLapsi.alkio.avain) {
+                    this.sisalto[index] = oikeaLapsi.alkio;
+                    this.percolateDown(oikeaLapsi.index);
+                }
+                else {
+                    this.sisalto[index] = vasenLapsi.alkio;
+                    this.percolateDown(vasenLapsi.index);
+                }
+            }
+        }
+        else if (oikeaLapsi && !vasenLapsi) {
+            if (oikeaLapsi.alkio.avain > viimeinen.alkio.avain) {
+                this.sisalto[index] = viimeinen.alkio;
+                this.sisalto[viimeinen.index] = null;
+            }
+            else {
                 this.sisalto[index] = oikeaLapsi.alkio;
                 this.percolateDown(oikeaLapsi.index);
+            }
+        }
+        else if (vasenLapsi && !oikeaLapsi) {
+            if (vasenLapsi.alkio.avain > viimeinen.alkio.avain) {
+                this.sisalto[index] = viimeinen.alkio;
+                this.sisalto[viimeinen.index] = null;
             }
             else {
                 this.sisalto[index] = vasenLapsi.alkio;
                 this.percolateDown(vasenLapsi.index);
             }
-        }
-        else if (oikeaLapsi && !vasenLapsi) {
-            this.sisalto[index] = oikeaLapsi.alkio;
-            this.sisalto[oikeaLapsi.index] = null;
-        }
-        else if (vasenLapsi && !oikeaLapsi) {
-            this.sisalto[index] = vasenLapsi.alkio;
-            this.sisalto[vasenLapsi.index] = null;
         }
     };
     Binaarikasa.prototype.vaihdaAlkiot = function (a, b) {
@@ -118,6 +127,17 @@ var Binaarikasa = /** @class */ (function () {
         else {
             return { alkio: lapsi, index: lapsenIndeksi };
         }
+    };
+    Binaarikasa.prototype.haeViimeinen = function () {
+        var index = this.sisalto.length - 1;
+        while (index > 0) {
+            var alkio = this.sisalto[index];
+            if (alkio) {
+                return { alkio: alkio, index: index };
+            }
+            index--;
+        }
+        return null;
     };
     Binaarikasa.prototype.haeAlkio = function (index) {
         var alkio = this.sisalto[index];

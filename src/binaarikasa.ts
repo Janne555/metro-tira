@@ -22,19 +22,7 @@ class Binaarikasa {
   }
 
   deleteMin(): void {
-    const vasenLapsi = this.haeVasenLapsi(1)
-    const oikeaLapsi = this.haeOikeaLapsi(1)
-    const viimeinen = this.sisalto[this.sisalto.length - 1]
-    if (vasenLapsi && oikeaLapsi && viimeinen) {
-      if (vasenLapsi.alkio.avain > viimeinen.avain && oikeaLapsi.alkio.avain > viimeinen.avain) {
-        this.sisalto[1] = viimeinen
-        this.sisalto[this.sisalto.length - 1] = null
-      } else {
-        this.percolateDown(1)
-      }
-    } else {
-      this.percolateDown(1)
-    }
+    this.percolateDown(1)
   }
 
   insert(alkio: KasaAlkio): void {
@@ -60,21 +48,42 @@ class Binaarikasa {
     this.sisalto[index] = null
     const vasenLapsi = this.haeVasenLapsi(index)
     const oikeaLapsi = this.haeOikeaLapsi(index)
+    const viimeinen = this.haeViimeinen()
+
+    if (!viimeinen) {
+      this.sisalto[index] = null
+      return
+    }
 
     if (vasenLapsi && oikeaLapsi) {
-      if (vasenLapsi.alkio.avain > oikeaLapsi.alkio.avain) {
+      if (vasenLapsi.alkio.avain > viimeinen.alkio.avain && oikeaLapsi.alkio.avain > viimeinen.alkio.avain) {
+        this.sisalto[index] = viimeinen.alkio
+        this.sisalto[viimeinen.index] = null
+      } else {
+        if (vasenLapsi.alkio.avain > oikeaLapsi.alkio.avain) {
+          this.sisalto[index] = oikeaLapsi.alkio
+          this.percolateDown(oikeaLapsi.index)
+        } else {
+          this.sisalto[index] = vasenLapsi.alkio
+          this.percolateDown(vasenLapsi.index)
+        }
+      }
+    } else if (oikeaLapsi && !vasenLapsi) {
+      if (oikeaLapsi.alkio.avain > viimeinen.alkio.avain) {
+        this.sisalto[index] = viimeinen.alkio
+        this.sisalto[viimeinen.index] = null
+      } else {
         this.sisalto[index] = oikeaLapsi.alkio
         this.percolateDown(oikeaLapsi.index)
+      }
+    } else if (vasenLapsi && !oikeaLapsi) {
+      if (vasenLapsi.alkio.avain > viimeinen.alkio.avain) {
+        this.sisalto[index] = viimeinen.alkio
+        this.sisalto[viimeinen.index] = null
       } else {
         this.sisalto[index] = vasenLapsi.alkio
         this.percolateDown(vasenLapsi.index)
       }
-    } else if (oikeaLapsi && !vasenLapsi) {
-      this.sisalto[index] = oikeaLapsi.alkio
-      this.sisalto[oikeaLapsi.index] = null
-    } else if (vasenLapsi && !oikeaLapsi) {
-      this.sisalto[index] = vasenLapsi.alkio
-      this.sisalto[vasenLapsi.index] = null
     }
   }
 
@@ -112,6 +121,18 @@ class Binaarikasa {
     } else {
       return { alkio: lapsi, index: lapsenIndeksi }
     }
+  }
+
+  haeViimeinen(): { alkio: KasaAlkio, index: number } | null{
+    let index = this.sisalto.length - 1
+    while (index > 0) {
+      const alkio = this.sisalto[index]
+      if (alkio) {
+        return { alkio, index }
+      }
+      index--
+    }
+    return null
   }
 
   haeAlkio(index: number): KasaAlkio {
