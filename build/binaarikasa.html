@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <script>var exports = {};</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+  <style>
+    .node circle {
+      fill: #fff;
+      stroke: steelblue;
+      stroke-width: 3px;
+    }
+
+    .node text {
+      font: 12px sans-serif;
+    }
+
+    .link {
+      fill: none;
+      stroke: #ccc;
+      stroke-width: 2px;
+    }
+
+    .content {
+      display: flex;
+    }
+
+    article {
+      width: 800px;
+    }
+  </style>
+</head>
+
+<body style="margin: 0; padding: 0;">
+  <header>
+    <a href="index.html">Alkuun</a>
+  </header>
+  <div class="content">
+    <article style="margin: 1rem;">
+      <h1>Tehtävä 12: Binäärikasa</h1>
+      Puun visualisointiin liittyvä koodi otettu <a href="https://bl.ocks.org/d3noob/8326869">täältä</a>
+      <h2>Käyttöliittymä</h2>
+      <div>
+        <label>Avain</label>
+        <input type="number" id="binaarikasa_avain" />
+        <button id="binaarikasa_lisaa">Lisaa alkio</button>
+      </div>
+      <div>
+        <button id="binaarikasa_tyhjenna">Tyhjennä</button>
+        <button id="binaarikasa_satunnainen">Satunnainen lista</button>
+        <button id="binaarikasa_poistapienin">Poista pienin</button>
+      </div>
+      <h3>Sisältö</h3>
+      <ul id="binaarikasa_sisalto">
+
+      </ul>
+      <h2>Lähdekoodi</h2>
+      <p>Alla on esillä tietorakenteen kannalta oleellinen lähdekoodi TypeScriptillä kirjoitettuna</p>
+      <pre style="border: 1px solid black; padding: 1em">
+    </pre>
+    </article>
+    <aside>
+      <h3>Puun sisältö</h3>
+      <div id="diagram"></div>
+    </aside>
+  </div>
+  <script src="binaarikasa.js"></script>
+  <script>
+    var kasa = new Binaarikasa()
+
+    binaarikasa_lisaa.onclick = lisaaListaan
+
+    binaarikasa_satunnainen.onclick = function () {
+      kasa = new Binaarikasa()
+      for (var i = 0; i < 10; i++) {
+        var avain = Math.round(Math.random() * 100)
+        var data = Math.random() + ""
+        kasa.insert({ avain, data })
+      }
+      tulostaKasa()
+    }
+
+    binaarikasa_tyhjenna.onclick = function () {
+      kasa = new Binaarikasa()
+      tulostaKasa()
+    }
+
+    binaarikasa_poistapienin.onclick = function () {
+      kasa.deleteMin()
+      tulostaKasa()
+    }
+
+    function lisaaListaan() {
+      if (binaarikasa_avain.value.length > 0) {
+        kasa.insert({ avain: Number(binaarikasa_avain.value), data: "dataaaa" })
+      }
+      clearInput("binaarikasa_avain")
+      tulostaKasa()
+    }
+
+    function clearInput(input) {
+      window[input].value = ""
+    }
+
+    function tulostaKasa() {
+      binaarikasa_sisalto.innerHTML = ""
+      kasa.sisalto.forEach(function (alkio) {
+        let li = document.createElement("li")
+        li.innerText = alkio ? `${alkio.avain}` : "null"
+        binaarikasa_sisalto.appendChild(li)
+      })
+      update(kasa.diagrammiData(1))
+    }
+
+    function update(source) {
+      diagram.innerHTML = ""
+      var margin = { top: 40, right: 120, bottom: 20, left: 120 },
+        width = 700 - margin.right - margin.left,
+        height = 500 - margin.top - margin.bottom;
+
+      var i = 0;
+
+      var tree = d3.layout.tree()
+        .size([height, width]);
+
+      var diagonal = d3.svg.diagonal()
+        .projection(function (d) { return [d.x, d.y]; });
+
+      var svg = d3.select("#diagram").append("svg")
+        .attr("width", width + margin.right + margin.left)
+        .attr("height", "100vh")
+        .style("height", d => d + "px")
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      // Compute the new tree layout.
+      var nodes = tree.nodes(source).reverse(),
+        links = tree.links(nodes);
+
+      // Normalize for fixed-depth.
+      nodes.forEach(function (d) { d.y = d.depth * 100; });
+
+      // Declare the nodes…
+      var node = svg.selectAll("g.node")
+        .data(nodes, function (d) { return d.id || (d.id = ++i); });
+
+      // Enter the nodes.
+      var nodeEnter = node.enter().append("g")
+        .attr("class", "node")
+        .attr("transform", function (d) {
+          return "translate(" + d.x + "," + d.y + ")";
+        })
+        .on('click', function (event) {
+          valinta = event.name;
+          naytaValinta();
+        });
+
+      nodeEnter.append("circle")
+        .attr("r", 10)
+        .style("fill", "#fff");
+
+      nodeEnter.append("text")
+        .attr("y", function (d) {
+          return d.children || d._children ? -18 : 18;
+        })
+        .attr("dy", ".35em")
+        .attr("text-anchor", "middle")
+        .text(function (d) { return d.name; })
+        .style("fill-opacity", 1);
+
+      // Declare the links…
+      var link = svg.selectAll("path.link")
+        .data(links, function (d) { return d.target.id; });
+
+      // Enter the links.
+      link.enter().insert("path", "g")
+        .attr("class", "link")
+        .attr("d", diagonal);
+    }
+  </script>
+</body>
+
+</html>
