@@ -72,11 +72,3 @@ var Lista = /** @class */ (function () {
     }
     return Lista;
 }());
-// const lista = new Lista()
-// const siemen = [1, 2, 3, 4, 5, 6, 7, 8]
-// lista.sisalto = siemen.map(avain => new Alkio(avain, `avain: ${avain}`))
-// // siemen.concat([9, 0, 50, -50]).forEach(avain => console.log(lista.hae(avain)))
-// lista.lisaa(new Alkio(50, "avain: 50"))
-// lista.lisaa(new Alkio(5, "avain: hups"))
-// lista.lisaa(new Alkio(-5, "avain: -5"))
-// console.log(lista.sisalto)
