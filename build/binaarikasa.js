@@ -30,7 +30,7 @@ var Binaarikasa = /** @class */ (function () {
         this.sisalto[0] = null;
     }
     Binaarikasa.prototype.deleteMin = function () {
-        this.percolateDown(1);
+        this.percolateDown(1, this.haeViimeinen());
     };
     Binaarikasa.prototype.insert = function (alkio) {
         var uusiPituus = this.sisalto.push(alkio);
@@ -47,11 +47,10 @@ var Binaarikasa = /** @class */ (function () {
             this.percolateUp(vanhempi.index);
         }
     };
-    Binaarikasa.prototype.percolateDown = function (index) {
+    Binaarikasa.prototype.percolateDown = function (index, viimeinen) {
         this.sisalto[index] = null;
         var vasenLapsi = this.haeVasenLapsi(index);
         var oikeaLapsi = this.haeOikeaLapsi(index);
-        var viimeinen = this.haeViimeinen();
         if (!viimeinen) {
             this.sisalto[index] = null;
             return;
@@ -64,11 +63,11 @@ var Binaarikasa = /** @class */ (function () {
             else {
                 if (vasenLapsi.alkio.avain > oikeaLapsi.alkio.avain) {
                     this.sisalto[index] = oikeaLapsi.alkio;
-                    this.percolateDown(oikeaLapsi.index);
+                    this.percolateDown(oikeaLapsi.index, viimeinen);
                 }
                 else {
                     this.sisalto[index] = vasenLapsi.alkio;
-                    this.percolateDown(vasenLapsi.index);
+                    this.percolateDown(vasenLapsi.index, viimeinen);
                 }
             }
         }
@@ -79,7 +78,7 @@ var Binaarikasa = /** @class */ (function () {
             }
             else {
                 this.sisalto[index] = oikeaLapsi.alkio;
-                this.percolateDown(oikeaLapsi.index);
+                this.percolateDown(oikeaLapsi.index, viimeinen);
             }
         }
         else if (vasenLapsi && !oikeaLapsi) {
@@ -89,8 +88,12 @@ var Binaarikasa = /** @class */ (function () {
             }
             else {
                 this.sisalto[index] = vasenLapsi.alkio;
-                this.percolateDown(vasenLapsi.index);
+                this.percolateDown(vasenLapsi.index, viimeinen);
             }
+        }
+        else {
+            this.sisalto[index] = viimeinen.alkio;
+            this.sisalto[viimeinen.index] = null;
         }
     };
     Binaarikasa.prototype.vaihdaAlkiot = function (a, b) {
@@ -133,6 +136,7 @@ var Binaarikasa = /** @class */ (function () {
         while (index > 0) {
             var alkio = this.sisalto[index];
             if (alkio) {
+                console.log(alkio);
                 return { alkio: alkio, index: index };
             }
             index--;

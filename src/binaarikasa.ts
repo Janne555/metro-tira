@@ -22,7 +22,7 @@ class Binaarikasa {
   }
 
   deleteMin(): void {
-    this.percolateDown(1)
+    this.percolateDown(1, this.haeViimeinen())
   }
 
   insert(alkio: KasaAlkio): void {
@@ -44,11 +44,10 @@ class Binaarikasa {
     }
   }
 
-  percolateDown(index: number): void {
+  percolateDown(index: number, viimeinen: { alkio: KasaAlkio, index: number } | null): void {
     this.sisalto[index] = null
     const vasenLapsi = this.haeVasenLapsi(index)
     const oikeaLapsi = this.haeOikeaLapsi(index)
-    const viimeinen = this.haeViimeinen()
 
     if (!viimeinen) {
       this.sisalto[index] = null
@@ -62,10 +61,10 @@ class Binaarikasa {
       } else {
         if (vasenLapsi.alkio.avain > oikeaLapsi.alkio.avain) {
           this.sisalto[index] = oikeaLapsi.alkio
-          this.percolateDown(oikeaLapsi.index)
+          this.percolateDown(oikeaLapsi.index, viimeinen)
         } else {
           this.sisalto[index] = vasenLapsi.alkio
-          this.percolateDown(vasenLapsi.index)
+          this.percolateDown(vasenLapsi.index, viimeinen)
         }
       }
     } else if (oikeaLapsi && !vasenLapsi) {
@@ -74,7 +73,7 @@ class Binaarikasa {
         this.sisalto[viimeinen.index] = null
       } else {
         this.sisalto[index] = oikeaLapsi.alkio
-        this.percolateDown(oikeaLapsi.index)
+        this.percolateDown(oikeaLapsi.index, viimeinen)
       }
     } else if (vasenLapsi && !oikeaLapsi) {
       if (vasenLapsi.alkio.avain > viimeinen.alkio.avain) {
@@ -82,8 +81,11 @@ class Binaarikasa {
         this.sisalto[viimeinen.index] = null
       } else {
         this.sisalto[index] = vasenLapsi.alkio
-        this.percolateDown(vasenLapsi.index)
+        this.percolateDown(vasenLapsi.index, viimeinen)
       }
+    } else {
+      this.sisalto[index] = viimeinen.alkio
+      this.sisalto[viimeinen.index] = null
     }
   }
 
@@ -123,11 +125,12 @@ class Binaarikasa {
     }
   }
 
-  haeViimeinen(): { alkio: KasaAlkio, index: number } | null{
+  haeViimeinen(): { alkio: KasaAlkio, index: number } | null {
     let index = this.sisalto.length - 1
     while (index > 0) {
       const alkio = this.sisalto[index]
       if (alkio) {
+        console.log(alkio)
         return { alkio, index }
       }
       index--
