@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <script>var exports = {};</script>
+</head>
+
+<body style="margin: 0; padding: 0;">
+  <header>
+    <a href="index.html">Alkuun</a>
+  </header>
+  <div class="content">
+    <article style="margin: 1rem;">
+      <div>
+        <span id="hajautus_virhe" style="color: red"></span>
+      </div>
+      <h1>Tehtävä 13: Suljettu hajautus</h1>
+      <h2>Käyttöliittymä</h2>
+      <div>
+        <label>Avain</label>
+        <input type="number" id="hajautus_avain" />
+        <label>Data</label>
+        <input type="text" id="hajautus_data" />
+        <button id="hajautus_lisaa">Lisaa alkio</button>
+      </div>
+      <div>
+        <label>Haku</label>
+        <input type="number" id="hajautus_haku" />
+        <button id="hajautus_hae">Hae listasta</button>
+      </div>
+      <div>
+        <button id="hajautus_tyhjenna">Tyhjennä</button>
+        <button id="hajautus_satunnainen">Satunnainen lista</button>
+      </div>
+      <h3>Sisältö</h3>
+      <ul id="hajautus_sisalto">
+
+      </ul>
+      <h3>Valinta</h3>
+      <p id="hajautus_hakutulos"></p>
+      <h2>Lähdekoodi</h2>
+      <p>Alla on esillä tietorakenteen kannalta oleellinen lähdekoodi TypeScriptillä kirjoitettuna</p>
+      <pre style="border: 1px solid black; padding: 1em;">
+class HajautusAlkio {
+  avain: number
+  data: string
+
+  constructor(avain: number, data: string) {
+    this.avain = avain
+    this.data = data
+  }
+}
+
+class HajautusTaulu {
+  taulu: (HajautusAlkio | undefined)[] = []
+  koko: number = 7
+
+  insert(alkio: HajautusAlkio): void {
+    const hashedIndex = this.hash(alkio.avain)
+    let resolvedIndex = hashedIndex
+    // Jos taulussa on jo jotain hashatyllä indexillä, etsi uusi indexi lineaarisesti
+    while (this.taulu[resolvedIndex] != null) {
+      if (this.taulu[resolvedIndex]?.avain === alkio.avain) {
+        throw new Error("Taulukossa on jo alkio annetulla avaimella")
+      }
+
+      resolvedIndex++
+
+      // jos etsittävä indeksi on pyörähtänyt takaisin alkuperäiseen indeksiin, taulukko on täynnä
+      if (resolvedIndex === hashedIndex) {
+        throw Error("Taulukko on täynnä")
+      }
+
+      // jos indeksi on suurempi kuin taulukon sallittu koko, aloita etsintä taulukon alusta
+      if (resolvedIndex >= this.koko) {
+        resolvedIndex = 0
+      }
+    }
+
+    this.taulu[resolvedIndex] = alkio
+  }
+
+  find(avain: number): HajautusAlkio | undefined {
+    if (avain < 0) {
+      throw Error("Avain ei saa olla negatiivinen")
+    }
+    const hashedIndex = this.hash(avain)
+    let resolvedIndex = hashedIndex
+    while (this.taulu[resolvedIndex]?.avain !== avain) {
+      resolvedIndex++
+      if (resolvedIndex === hashedIndex) {
+        return undefined
+      }
+
+      if (resolvedIndex >= this.koko) {
+        resolvedIndex = 0
+      }
+    }
+
+    return this.taulu[resolvedIndex]
+  }
+
+  hash(avain: number): number {
+    return avain % this.koko
+  }
+}
+    </pre>
+    </article>
+  </div>
+  <script src="hajautustaulu.js"></script>
+  <script>
+    var taulu = new HajautusTaulu()
+
+    hajautus_lisaa.onclick = lisaaListaan
+
+    hajautus_hae.onclick = haeListasta
+
+    hajautus_satunnainen.onclick = function () {
+      taulu = new HajautusTaulu()
+      for (var i = 0; i < 7; i++) {
+        var avain = Math.round(Math.random() * 10)
+        var data = Math.random() + ""
+        try {
+          taulu.insert({ avain, data })
+        } catch (error) { }
+      }
+      tulostaLista()
+    }
+
+    hajautus_tyhjenna.onclick = function () {
+      taulu = new HajautusTaulu()
+      tulostaLista()
+    }
+
+    function lisaaListaan() {
+      if (hajautus_avain.value.length > 0 && hajautus_data.value.length > 0) {
+        virhe(function () {
+          taulu.insert({ avain: Number(hajautus_avain.value), data: hajautus_data.value })
+        })
+      }
+      clearInput("hajautus_avain")
+      clearInput("hajautus_data")
+      tulostaLista()
+    }
+
+    function clearInput(input) {
+      window[input].value = ""
+    }
+
+    function haeListasta() {
+      virhe(function () {
+        var tulos = taulu.find(Number(hajautus_haku.value))
+        if (tulos) {
+          hajautus_hakutulos.innerText = `avain: ${tulos.avain}, data: ${tulos.data}`
+        } else {
+          hajautus_hakutulos.innerText = "ei löytynyt"
+        }
+      })
+      clearInput("hajautus_haku")
+    }
+
+    function tulostaLista() {
+      hajautus_sisalto.innerHTML = ""
+      taulu.taulu.forEach(function (alkio) {
+        let li = document.createElement("li")
+        li.innerText = `avain: ${alkio.avain}, data: ${alkio.data}`
+        hajautus_sisalto.appendChild(li)
+      })
+    }
+
+    function virhe(funktio) {
+      poistaVirhe()
+      try {
+        funktio()
+      } catch (error) {
+        console.error(error.message)
+        hajautus_virhe.innerHTML = error.message
+      }
+    }
+
+    function poistaVirhe() {
+      hajautus_virhe.innerHTML = ""
+    }
+  </script>
+</body>
+
+</html>
