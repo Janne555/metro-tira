@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <script>var exports = {};</script>
+</head>
+
+<body style="margin: 0; padding: 0;">
+  <header>
+    <a href="index.html">Alkuun</a>
+  </header>
+  <div class="content">
+    <article style="margin: 1rem;">
+      <div>
+        <span id="postfix_virhe" style="color: red"></span>
+      </div>
+      <h1>Tehtävä 14: Postfix-laskin</h1>
+      <h2>Käyttöliittymä</h2>
+      <div>
+        <label>Syöte</label>
+        <input id="postfix_syote" />
+        <button id="postfix_laske">Laske</button>
+      </div>
+      <h3>Tulos</h3>
+      <p id="postfix_tulos"></p>
+      <h2>Lähdekoodi</h2>
+      <p>Alla on esillä tietorakenteen kannalta oleellinen lähdekoodi TypeScriptillä kirjoitettuna</p>
+      <pre style="border: 1px solid black; padding: 1em;">
+function parseString(input: string) {
+  const stack: number[] = []
+  const parts = input.split(" ")
+
+  const operations: Record<string, () => false> = {
+    "+"() {
+      const [first, last] = topTwo()
+      stack.push(first + last)
+      return false
+    },
+    "-"() {
+      const [first, last] = topTwo()
+      stack.push(first - last)
+      return false
+    },
+    "/"() {
+      const [first, last] = topTwo()
+      stack.push(first / last)
+      return false
+    },
+    "*"() {
+      const [first, last] = topTwo()
+      stack.push(first * last)
+      return false
+    }
+  }
+
+  for (let part of parts) {
+    if (operations[part]?.() === undefined) {
+      handleInput(part)
+    }
+  }
+
+  if (stack.length !== 1) {
+    throw Error(`Invalid number of operations. Stack has ${stack.length}`)
+  } else {
+    return stack[0]
+  }
+
+  function handleInput(part: string) {
+    const number = Number(part)
+    if (isNaN(number)) {
+      throw Error(`Invalid input ${part}`)
+    } else {
+      stack.push(number)
+    }
+  }
+
+  function topTwo(): [number, number] {
+    const first = stack.pop()
+    const second = stack.pop()
+    if (first == null || second == null) {
+      throw Error("Not enough operands on stack")
+    } else {
+      return [first, second]
+    }
+  }
+}
+    </pre>
+    </article>
+  </div>
+  <script src="postfixlaskin.js"></script>
+  <script>
+    postfix_syote.onkeypress = function (event) {
+      if (event.keyCode === 13) {
+        laske()
+      }
+    }
+
+    postfix_laske.onclick = laske
+
+    function laske() {
+      virhe(function () {
+        const tulos = parseString(postfix_syote.value)
+        postfix_tulos.innerText = tulos
+      })
+      postfix_syote.value = ""
+    }
+
+    function virhe(funktio) {
+      poistaVirhe()
+      try {
+        funktio()
+      } catch (error) {
+        console.error(error.message)
+        postfix_virhe.innerHTML = error.message
+      }
+    }
+
+    function poistaVirhe() {
+      postfix_virhe.innerHTML = ""
+    }
+  </script>
+</body>
+
+</html>
